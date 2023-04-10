@@ -1,0 +1,26 @@
+.container {
+    background-color: var(--container-background-darker);
+    margin: 2rem 3rem 5rem 3rem;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid white;
+}
+
+.titleContainer {
+    background: var(--color-gray);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin-bottom: 1.3rem;
+}
+
+.container h3 {
+    font-size: 2rem;
+    margin: 0;
+    padding: 1rem;
+}
+
+@media screen and (max-width: 930px) {
+    .container {
+        margin: 2rem 1rem 5rem 1rem;
+    }
+}

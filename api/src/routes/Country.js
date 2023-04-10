@@ -1,13 +1,13 @@
-const { Router } =require("express");
-const { Country, Activity,cache} =require("../db");
+const { Router } = require('express');
+const { Country, Activity, cache } = require('../db');
 
-const axios =require("axios");
-const apiallurl="https://restcountries.com/v3.1/all"
+const axios = require('axios');
+const API_ALL_URL = 'https://restcountries.com/v3.1/all';
 
 const countryRoute = Router();
 
 const getAllCountries = async () => {
-    const { data } = await axios.get(apiallurl);
+    const { data } = await axios.get(API_ALL_URL);
 
     if (!cache.allCountries) { // Si el cache está vacio, significa que la base de datos esta vacia, entonces la lleno
         cache.allCountries = {};
@@ -32,13 +32,13 @@ const getAllCountries = async () => {
     // Guardo en caché todos los paises con las nuevas actividades
     const countriesWithActivities = await Country.findAll({ include: Activity });
     cache.allCountries = countriesWithActivities;
-    
+    // cache.allCountries = true;
 }
 
 countryRoute.get('/', async (req, res, next) => {
     const { name } = req.query;
     try {
-        // se ingresa un await por que cache espera que lo llene 
+        //await getAllCountries();
         if (!cache.allCountries) await getAllCountries();
 
         let countries;
@@ -52,12 +52,13 @@ countryRoute.get('/', async (req, res, next) => {
                 }
             })
             filterCountries.sort((a, b) => a.index - b.index);
-            
+            // countries = await Country.findAll({ where: { name }, include: Activity })
+            // return res.status(200).send(countries);
             return res.status(200).send(filterCountries);
         }
         countries = await Country.findAll({ include: Activity });
         res.status(200).send(countries);
-        
+        // res.status(200).send(cache.allCountries);
     } catch (error) {
         next(error);
     }
@@ -68,6 +69,7 @@ countryRoute.get('/:id', async (req, res, next) => {
     if (!id) next(new Error('El ID es requerido'));
     try {
         if (!cache.allCountries) await getAllCountries();
+        // if (!cache.allCountries) await getAllCountries();
         const country = await Country.findByPk(id, { include: Activity });
         if (!country) return res.status(404).send({ error: 'El id es invalido' });
         res.status(200).send(country);
